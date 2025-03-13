@@ -9,7 +9,7 @@ import {
   CustomAbortController,
   Authorities,
 } from "./utils/before";
-import { StakeConnection, PythBalance } from "../app";
+import { StakeConnection, PythBalance, StakeAccount } from "../app";
 import { Target, TargetWithParameters } from "../app/StakeConnection";
 import { abortUnlessDetached } from "./utils/after";
 import assert from "assert";
@@ -21,6 +21,16 @@ describe("pool authority", async () => {
   let stakeConnection: StakeConnection;
   let program: Program<Staking>;
   let authorities: Authorities;
+
+  let stakeAcc: StakeAccount;
+
+  async function summary() {
+    try {
+      console.log('- GetBalanceSummary:', await stakeAcc.getBalanceSummary(await stakeConnection!.getTime()));
+    } catch (error) {
+      // console.log('Error:', error);
+    }
+  }
 
   const publisher = PublicKey.unique();
 
@@ -46,11 +56,15 @@ describe("pool authority", async () => {
       stakeConnection.userPublicKey()
     );
 
+    stakeAcc = stakeAccount;
+
     const targetWithParameters: TargetWithParameters = {
       integrityPool: {
         publisher,
       },
     };
+
+    await summary()
 
     await expectFail(
       program.methods
@@ -91,6 +105,7 @@ describe("pool authority", async () => {
       })
       .signers([authorities.poolAuthority])
       .rpc();
+    await summary()
   });
 
   it("attempts to close the position", async () => {
@@ -203,6 +218,7 @@ describe("pool authority", async () => {
       .signers([authorities.poolAuthority])
       .rpc();
 
+    await summary()
     stakeAccount = await stakeConnection.getMainAccount(
       stakeConnection.userPublicKey()
     );

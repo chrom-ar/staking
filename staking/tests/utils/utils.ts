@@ -133,7 +133,7 @@ export async function expectFail<
   A extends I["accounts"][number] = I["accounts"][number]
 >(rpcCall: MethodsBuilder<Staking, I, A>, expectedMessage: string) {
   try {
-    await rpcCall.rpc();
+    await rpcCall.rpc({ skipPreflight: false }); // skip: false needed to catch the error
     assert(false, "Transaction should fail");
   } catch (err) {
     if (err instanceof AnchorError) {

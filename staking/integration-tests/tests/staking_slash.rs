@@ -1,3 +1,4 @@
+use integration_tests::utils::clock::get_current_epoch;
 use {
     anchor_spl::token::TokenAccount,
     integration_tests::{
@@ -72,7 +73,7 @@ fn test_staking_slash() {
 
     update_pool_authority(&mut svm, &payer, pool_authority.pubkey());
 
-    create_position(
+    let tx = create_position(
         &mut svm,
         &payer,
         stake_account_positions,
@@ -80,16 +81,19 @@ fn test_staking_slash() {
             publisher: publisher_keypair.pubkey(),
         },
         Some(&pool_authority),
-        50 * FRAC_64_MULTIPLIER,
+        95 * FRAC_64_MULTIPLIER,
     )
     .unwrap();
+    for log in &tx.logs {
+        println!("XX create position log:  {:?}", log);
+    }
     create_position(
         &mut svm,
         &payer,
         stake_account_positions,
         staking::state::positions::TargetWithParameters::Voting,
         None,
-        10 * FRAC_64_MULTIPLIER,
+        15 * FRAC_64_MULTIPLIER,
     )
     .unwrap();
     svm.expire_blockhash();
@@ -103,6 +107,17 @@ fn test_staking_slash() {
         80 * FRAC_64_MULTIPLIER,
     )
     .unwrap();
+    // svm.expire_blockhash();
+    // create_position(
+    //     &mut svm,
+    //     &payer,
+    //     stake_account_positions,
+    //     staking::state::positions::TargetWithParameters::Voting,
+    //     None,
+    //     7 * FRAC_64_MULTIPLIER,
+    // )
+    // .unwrap();
+    // svm.expire_blockhash();
 
     let stake_account_metadata = get_stake_account_metadata_address(stake_account_positions);
     let metadata_account: StakeAccountMetadataV2 =
@@ -113,6 +128,7 @@ fn test_staking_slash() {
     // position will become LOCKED at epoch N+1
     // at epoch N+2, we can slash epoch N+1
     advance_n_epochs(&mut svm, &payer, 2);
+    advance_n_epochs(&mut svm, &payer, 50);
 
     assert_anchor_program_error!(
         slash_staking(
@@ -128,16 +144,69 @@ fn test_staking_slash() {
         0
     );
 
-    slash_staking(
+    let mut stake_positions_account = fetch_positions_account(&mut svm, &stake_account_positions);
+    let positions = stake_positions_account.to_dynamic_position_array();
+    let pos0 = positions.read_position(0).unwrap().unwrap();
+
+    // assert_eq!(pos0.amount, 50 * FRAC_64_MULTIPLIER);
+    // assert_eq!(
+    //     pos0.target_with_parameters,
+    //     TargetWithParameters::IntegrityPool {
+    //         publisher: publisher_keypair.pubkey(),
+    //     }
+    // );
+
+
+    // println!("Position 2: {:?}", pos2);
+
+
+    // svm.expire_blockhash();
+
+    let slash_meta = slash_staking(
         &mut svm,
         &payer,
         stake_account_positions,
         &pool_authority,
-        FRAC_64_MULTIPLIER / 2,
+        FRAC_64_MULTIPLIER,
         publisher_keypair.pubkey(),
         slash_token_account.pubkey(),
     )
     .unwrap();
+
+    for log in &slash_meta.logs {
+        println!("{:?}", log);
+    }
+    advance_n_epochs(&mut svm, &payer, 50);
+    println!("Advanced and slashing again");
+    let slash_meta = slash_staking(
+        &mut svm,
+        &payer,
+        stake_account_positions,
+        &pool_authority,
+        FRAC_64_MULTIPLIER,
+        publisher_keypair.pubkey(),
+        slash_token_account.pubkey(),
+    ).unwrap();
+
+    for log in &slash_meta.logs {
+        println!("{:?}", log);
+    }
+    // println!("Slashing logs: {:?}", slash_meta.logs);
+
+    let mut stake_positions_account = fetch_positions_account(&mut svm, &stake_account_positions);
+    let positions = stake_positions_account.to_dynamic_position_array();
+    let pos0 = positions.read_position(0).unwrap().unwrap();
+    let pos0_algo = pos0.get_current_position( get_current_epoch(&mut svm)).unwrap();
+    println!("Position 0: {:?} {:?}", pos0, pos0_algo);
+    let pos1 = positions.read_position(1).unwrap().unwrap();
+    let pos1_algo = pos1.get_current_position( get_current_epoch(&mut svm)).unwrap();
+    println!("Position 1: {:?} {:?}", pos1, pos1_algo);
+    let pos2 = positions.read_position(2).unwrap().unwrap();
+    let pos2_algo = pos2.get_current_position( get_current_epoch(&mut svm)).unwrap();
+    println!("Position 2: {:?} {:?}", pos2, pos2_algo);
+    let pos3 = positions.read_position(3).unwrap().unwrap();
+    let pos3_algo = pos3.get_current_position( get_current_epoch(&mut svm)).unwrap();
+    println!("Position 3: {:?} {:?}", pos3, pos3_algo);
 
     let mut stake_positions_account = fetch_positions_account(&mut svm, &stake_account_positions);
     let positions = stake_positions_account.to_dynamic_position_array();

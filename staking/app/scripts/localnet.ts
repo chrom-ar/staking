@@ -23,27 +23,12 @@ async function main() {
   const bob = loadKeypair("./app/keypairs/bob.json");
   const pythMintAccount = loadKeypair("./app/keypairs/pyth_mint.json");
 
-  console.log("Validator at port ", portNumber);
   const config = readAnchorConfig(ANCHOR_CONFIG_PATH);
   ({ controller, stakeConnection } = await standardSetup(
     portNumber,
     config,
     pythMintAccount,
     pythMintAuthority,
-    {
-      bump: 0,
-      governanceAuthority: null,
-      pythGovernanceRealm: null,
-      pythTokenMint: pythMintAccount.publicKey,
-      unlockingDuration: 2,
-      epochDuration: new BN(1),
-      mockClockTime: new BN(10),
-      freeze: false,
-      pdaAuthority: null,
-      governanceProgram: new PublicKey(0),
-      pythTokenListTime: null,
-      agreementHash: getDummyAgreementHash(),
-    }
   ));
 
   for (let owner of [alice.publicKey, bob.publicKey]) {

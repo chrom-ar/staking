@@ -78,7 +78,7 @@ pub fn setup(props: SetupProps) -> SetupResult {
     )
     .unwrap();
 
-    svm.airdrop(&payer.pubkey(), 100_000_000_000).unwrap();
+    svm.airdrop(&payer.pubkey(), 200_000_000_000).unwrap();
 
     if init_config {
         init_config_account(&mut svm, &payer, pyth_token_mint.pubkey());
@@ -109,7 +109,7 @@ pub fn setup(props: SetupProps) -> SetupResult {
     if init_publishers {
         initialize_pool_reward_custody(&mut svm, &payer, &pyth_token_mint, reward_amount_override);
         let publisher_caps =
-            post_dummy_publisher_caps(&mut svm, &payer, publisher_keypair.pubkey(), 100);
+            post_dummy_publisher_caps(&mut svm, &payer, publisher_keypair.pubkey(), 80);
         advance(&mut svm, &payer, publisher_caps).unwrap();
     }
 

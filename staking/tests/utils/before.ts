@@ -201,9 +201,7 @@ export async function startValidator(
     config.programs.localnet.wallet_tester
   } ${config.path.wallet_tester_path} --bpf-program ${
     config.programs.localnet.profile
-  } ${config.path.profile_path}
-
-  --clone ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk -ud`;
+  } ${config.path.profile_path} --slots-per-epoch 1200 --ticks-per-slot 10 --clone ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk -ud`;
 
   const { controller, connection } = await startValidatorRaw(
     portNumber,
@@ -371,7 +369,7 @@ export function makeDefaultConfig(
     governanceAuthority: null,
     pythGovernanceRealm: null,
     pythTokenMint,
-    unlockingDuration: 1,
+    removedUnlockingDuration: 0,
     epochDuration: new BN(3600),
     freeze: true,
     mockClockTime: new BN(10),
@@ -454,18 +452,25 @@ export interface Authorities {
  * - Initializes the global config of the Pyth staking program to some default values
  * - Creates a connection to the localnet Pyth staking program
  * */
-export async function standardSetup(portNumber: number): Promise<{
+export async function standardSetup(
+  portNumber: number,
+  config?: AnchorConfig,
+  pythMintAccount?: Keypair,
+  pythMintAuthority?: Keypair,
+  globalConfig?: GlobalConfig,
+  amount?: PythBalance
+): Promise<{
   controller: CustomAbortController;
   stakeConnection: StakeConnection;
   authorities: Authorities;
 }> {
-  const pythMintAccount = new Keypair();
-  const pythMintAuthority = new Keypair();
-  const pdaAuthority = new Keypair();
+  pythMintAccount = pythMintAccount || new Keypair();
+  pythMintAuthority = pythMintAuthority || new Keypair();
+  const pdaAuthority = (globalConfig?.pdaAuthority || new Keypair()) as Keypair;
   const poolAuthority = new Keypair();
 
-  const config = readAnchorConfig(ANCHOR_CONFIG_PATH);
-  const globalConfig = makeDefaultConfig(
+  config = config || readAnchorConfig(ANCHOR_CONFIG_PATH);
+  globalConfig = globalConfig || makeDefaultConfig(
     pythMintAccount.publicKey,
     new PublicKey(config.programs.localnet.governance),
     pdaAuthority.publicKey
@@ -488,9 +493,11 @@ export async function standardSetup(portNumber: number): Promise<{
     user,
     pythMintAccount.publicKey,
     pythMintAuthority,
-    PythBalance.fromString("1000"),
+    amount ? amount : PythBalance.fromString("1000"),
     program.provider.connection
   );
+
+
 
   if (globalConfig.pythGovernanceRealm == null) {
     const { realm, governance } = await createDefaultRealm(
