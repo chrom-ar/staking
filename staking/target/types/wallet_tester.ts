@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/wallet_tester.json`.
  */
 export type WalletTester = {
-  "address": "6WiE3bwtbY1ofcL2L95LvyAHunYinAxXjxXGM1Gxua7F",
+  "address": "321KojcMTHwEwzDjt9j71iowtqMPMrfvQ6at1xbJdJWS",
   "metadata": {
     "name": "walletTester",
     "version": "1.0.0",

@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/profile.json`.
  */
 export type Profile = {
-  "address": "D6tKzDdjSCkPa6Xk8hJLrSCUTh7bvWtW7ybaYX1aZxWB",
+  "address": "bR3uQJLEmg2H46GuozXn8uNQmp2DaZEp6EK1kW56npd",
   "metadata": {
     "name": "profile",
     "version": "1.0.0",

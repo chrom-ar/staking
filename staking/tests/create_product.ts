@@ -22,16 +22,12 @@ describe("create_product", async () => {
   let bump: number;
 
   before(async () => {
-    console.log('create_product.ts:24');
     ({ controller, stakeConnection } = await standardSetup(portNumber));
-    console.log('create_product.ts:26');
 
     program = stakeConnection.program;
-    console.log('create_product.ts:29');
   });
 
   it("checks governance product", async () => {
-    console.log('create_product.ts:30');
     [targetAccount, bump] = await PublicKey.findProgramAddress(
       [
         utils.bytes.utf8.encode(wasm.Constants.TARGET_SEED()),
@@ -40,11 +36,9 @@ describe("create_product", async () => {
       program.programId
     );
 
-    console.log('create_product.ts:39');
     const productAccountData = await program.account.targetMetadata.fetch(
       targetAccount
     );
-    console.log('create_product.ts:43');
 
     assert.equal(
       JSON.stringify(productAccountData),
@@ -58,7 +52,6 @@ describe("create_product", async () => {
         deltaLocked: new BN(0),
       })
     );
-    console.log('create_product.ts:57');
   });
 
   after(async () => {
