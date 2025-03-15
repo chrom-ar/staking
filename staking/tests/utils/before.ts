@@ -130,6 +130,9 @@ export async function startValidatorRaw(portNumber: number, otherArgs: string) {
   const internalController: AbortController = new AbortController();
   const { signal } = internalController;
 
+  console.log(`solana-test-validator --ledger ${ledgerDir} --rpc-port ${portNumber} --faucet-port ${
+      portNumber + 101
+    } ${otherArgs}`)
   exec(
     `solana-test-validator --ledger ${ledgerDir} --rpc-port ${portNumber} --faucet-port ${
       portNumber + 101
@@ -352,12 +355,15 @@ export async function initConfig(
   program: Program<Staking>,
   globalConfig: GlobalConfig
 ) {
+  console.log('before.ts:354');
   const [configAccount, bump] = await PublicKey.findProgramAddress(
     [utils.bytes.utf8.encode(wasm.Constants.CONFIG_SEED())],
     program.programId
   );
 
+  console.log('before.ts:360', program.programId.toBase58());
   await program.methods.initConfig(globalConfig).rpc();
+  console.log('before.ts:362');
 }
 
 export function makeDefaultConfig(
@@ -464,11 +470,13 @@ export async function standardSetup(
   stakeConnection: StakeConnection;
   authorities: Authorities;
 }> {
+  console.log('before.ts:466');
   pythMintAccount = pythMintAccount || new Keypair();
   pythMintAuthority = pythMintAuthority || new Keypair();
   const pdaAuthority = (globalConfig?.pdaAuthority || new Keypair()) as Keypair;
   const poolAuthority = new Keypair();
 
+  console.log('before.ts:472');
   config = config || readAnchorConfig(ANCHOR_CONFIG_PATH);
   globalConfig = globalConfig || makeDefaultConfig(
     pythMintAccount.publicKey,
@@ -476,8 +484,10 @@ export async function standardSetup(
     pdaAuthority.publicKey
   );
 
+  console.log('before.ts:480');
   const { controller, program } = await startValidator(portNumber, config);
 
+  console.log('before.ts:483');
   await createMint(
     program.provider,
     pythMintAccount,
@@ -487,8 +497,10 @@ export async function standardSetup(
     TOKEN_PROGRAM_ID
   );
 
+  console.log('before.ts:493');
   const user = program.provider.publicKey;
 
+  console.log('before.ts:496');
   await requestPythAirdrop(
     user,
     pythMintAccount.publicKey,
@@ -497,7 +509,7 @@ export async function standardSetup(
     program.provider.connection
   );
 
-
+  console.log('before.ts:505');
 
   if (globalConfig.pythGovernanceRealm == null) {
     const { realm, governance } = await createDefaultRealm(
@@ -510,6 +522,7 @@ export async function standardSetup(
     globalConfig.pythGovernanceRealm = realm;
   }
 
+  console.log('before.ts:518');
   const temporaryConfig = { ...globalConfig };
   // User becomes a temporary dictator during setup
   temporaryConfig.governanceAuthority = user;
@@ -517,9 +530,12 @@ export async function standardSetup(
 
   await initConfig(program, temporaryConfig);
 
+  console.log('before.ts:526');
   await createVotingTarget(program);
 
+  console.log('before.ts:529');
   if (process.env.DETACH) {
+    console.log('before.ts:531');
     const lookupTableAddress = await initAddressLookupTable(
       program.provider,
       pythMintAccount.publicKey
@@ -527,22 +543,26 @@ export async function standardSetup(
     console.log("Lookup table address: ", lookupTableAddress.toBase58());
   }
 
+  console.log('before.ts:539');
   // Give the power back to the people
   await program.methods
     .updateGovernanceAuthority(globalConfig.governanceAuthority)
     .accounts({ governanceSigner: user })
     .rpc();
 
+    console.log('before.ts:546');
   const connection = new Connection(
     `http://127.0.0.1:${portNumber}`,
     AnchorProvider.defaultOptions().commitment
   );
 
+  console.log('before.ts:552');
   const stakeConnection = await StakeConnection.createStakeConnection(
     connection,
     (program.provider as AnchorProvider).wallet as Wallet,
     new PublicKey(config.programs.localnet.staking)
   );
+  console.log('before.ts:558');
 
   return {
     controller,

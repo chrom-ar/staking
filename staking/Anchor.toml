@@ -1,38 +1,33 @@
-anchor_version = "0.24.1"
+[toolchain]
 
 [features]
-seeds = true
-
-[workspace]
-members = ["programs/staking", "programs/wallet-tester", "programs/profile", "programs/integrity-pool", "programs/publisher-caps"]
-
-[programs.localnet]
-staking = "pytS9TjG1qyAZypk7n8rw8gfW9sUaqqYyMhJQ4E7JCQ"
-governance = "pytGY6tWRgGinSCvRLnSv4fHfBTMoiDGiCsesmHWM6U"
-chat = "gCHAtYKrUUktTVzE4hEnZdLV4LXrdBf6Hh9qMaJALET"
-wallet_tester = "tstPARXbQ5yxVkRU2UcZRbYphzbUEW6t5ihzpLaafgz"
-profile = "prfmVhiQTN5Spgoxa8uZJba35V1s7XXReqbBiqPDWeJ"
-integrity_pool = "pyti8TM4zRVBjmarcgAPmTNNAXYKJv7WVHrkrm6woLN"
-publisher_caps = "pytcD8uUjPxSLMsNqoVnm9dXQw9tKJJf3CQnGwa8oL7"
+resolution = true
+skip-lint = false
 
 [programs.devnet]
-staking = "pytS9TjG1qyAZypk7n8rw8gfW9sUaqqYyMhJQ4E7JCQ"
 governance = "pytGY6tWRgGinSCvRLnSv4fHfBTMoiDGiCsesmHWM6U"
-wallet_tester = "tstPARXbQ5yxVkRU2UcZRbYphzbUEW6t5ihzpLaafgz"
-profile = "prfmVhiQTN5Spgoxa8uZJba35V1s7XXReqbBiqPDWeJ"
-integrity_pool = "pyti8TM4zRVBjmarcgAPmTNNAXYKJv7WVHrkrm6woLN"
-publisher_caps = "pytcD8uUjPxSLMsNqoVnm9dXQw9tKJJf3CQnGwa8oL7"
+integrity_pool = "5ukY1VB5gm1mynieWvcy92amcaVPKMSYawN5L96meh7t"
+profile = "bR3uQJLEmg2H46GuozXn8uNQmp2DaZEp6EK1kW56npd"
+publisher_caps = "FaEDHKZKMDemCskgseX4A4r4AxiPCR5cha9vNzd6JUzY"
+staking = "7VgwUAtQbEyd2Ssa9ajMyUJFpbdxNYAKsmkECtZbw3pp"
+wallet_tester = "321KojcMTHwEwzDjt9j71iowtqMPMrfvQ6at1xbJdJWS"
 
+[programs.localnet]
+chat = "gCHAtYKrUUktTVzE4hEnZdLV4LXrdBf6Hh9qMaJALET"
+governance = "pytGY6tWRgGinSCvRLnSv4fHfBTMoiDGiCsesmHWM6U"
+integrity_pool = "5ukY1VB5gm1mynieWvcy92amcaVPKMSYawN5L96meh7t"
+profile = "bR3uQJLEmg2H46GuozXn8uNQmp2DaZEp6EK1kW56npd"
+publisher_caps = "FaEDHKZKMDemCskgseX4A4r4AxiPCR5cha9vNzd6JUzY"
+staking = "7VgwUAtQbEyd2Ssa9ajMyUJFpbdxNYAKsmkECtZbw3pp"
+wallet_tester = "321KojcMTHwEwzDjt9j71iowtqMPMrfvQ6at1xbJdJWS"
 
 [programs.mainnet]
-staking = "pytS9TjG1qyAZypk7n8rw8gfW9sUaqqYyMhJQ4E7JCQ"
 governance = "pytGY6tWRgGinSCvRLnSv4fHfBTMoiDGiCsesmHWM6U"
-wallet_tester = "tstPARXbQ5yxVkRU2UcZRbYphzbUEW6t5ihzpLaafgz"
-profile = "prfmVhiQTN5Spgoxa8uZJba35V1s7XXReqbBiqPDWeJ"
-integrity_pool = "pyti8TM4zRVBjmarcgAPmTNNAXYKJv7WVHrkrm6woLN"
-publisher_caps = "pytcD8uUjPxSLMsNqoVnm9dXQw9tKJJf3CQnGwa8oL7"
-
-
+integrity_pool = "5ukY1VB5gm1mynieWvcy92amcaVPKMSYawN5L96meh7t"
+profile = "bR3uQJLEmg2H46GuozXn8uNQmp2DaZEp6EK1kW56npd"
+publisher_caps = "FaEDHKZKMDemCskgseX4A4r4AxiPCR5cha9vNzd6JUzY"
+staking = "7VgwUAtQbEyd2Ssa9ajMyUJFpbdxNYAKsmkECtZbw3pp"
+wallet_tester = "321KojcMTHwEwzDjt9j71iowtqMPMrfvQ6at1xbJdJWS"
 
 [registry]
 url = "https://anchor.projectserum.com"
@@ -40,6 +35,9 @@ url = "https://anchor.projectserum.com"
 [provider]
 cluster = "localnet"
 wallet = "./app/keypairs/localnet_authority.json"
+
+[workspace]
+members = ["programs/staking", "programs/wallet-tester", "programs/profile", "programs/integrity-pool", "programs/publisher-caps"]
 
 [scripts]
 test = "npx ts-mocha -p ./tsconfig.json -t 1000000 tests/staking.ts"
@@ -55,11 +53,3 @@ chat_path = "./tests/programs/chat.so"
 wallet_tester_path = "./target/deploy/wallet_tester.so"
 profile_path = "./target/deploy/profile.so"
 integrity_pool_path = "./target/deploy/integrity_pool.so"
-
-# [test.validator]
-# bind_address = "0.0.0.0"
-# url = "https://api.devnet.solana.com"
-# ledger = ".anchor/test-ledger"
-# rpc_port = 8899
-# slots_per_epoch = "64"
-# ticks_per_slot = 2

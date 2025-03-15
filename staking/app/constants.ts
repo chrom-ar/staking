@@ -5,15 +5,15 @@ export function GOVERNANCE_ADDRESS(): PublicKey {
 }
 
 export const STAKING_ADDRESS = new PublicKey(
-  "pytS9TjG1qyAZypk7n8rw8gfW9sUaqqYyMhJQ4E7JCQ"
+  "7VgwUAtQbEyd2Ssa9ajMyUJFpbdxNYAKsmkECtZbw3pp"
 );
 
 export const WALLET_TESTER_ADDRESS = new PublicKey(
-  "tstPARXbQ5yxVkRU2UcZRbYphzbUEW6t5ihzpLaafgz"
+  "321KojcMTHwEwzDjt9j71iowtqMPMrfvQ6at1xbJdJWS"
 );
 
 export const PROFILE_ADDRESS = new PublicKey(
-  "prfmVhiQTN5Spgoxa8uZJba35V1s7XXReqbBiqPDWeJ"
+  "bR3uQJLEmg2H46GuozXn8uNQmp2DaZEp6EK1kW56npd"
 );
 
 export const REALM_ID = new PublicKey(

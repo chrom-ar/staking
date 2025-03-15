@@ -3,7 +3,7 @@
 //! This program allows a Solana user to map their Solana address to their addresses on other chains
 use anchor_lang::prelude::*;
 
-declare_id!("prfmVhiQTN5Spgoxa8uZJba35V1s7XXReqbBiqPDWeJ");
+declare_id!("bR3uQJLEmg2H46GuozXn8uNQmp2DaZEp6EK1kW56npd");
 
 #[program]
 pub mod profile {

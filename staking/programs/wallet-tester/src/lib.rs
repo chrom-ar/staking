@@ -4,7 +4,7 @@
 //! It's used so that future recipients of locked tokens can test before they receive the tokens
 use anchor_lang::prelude::*;
 
-declare_id!("tstPARXbQ5yxVkRU2UcZRbYphzbUEW6t5ihzpLaafgz");
+declare_id!("321KojcMTHwEwzDjt9j71iowtqMPMrfvQ6at1xbJdJWS");
 
 #[program]
 pub mod wallet_tester {

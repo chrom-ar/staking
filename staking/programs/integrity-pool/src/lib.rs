@@ -24,7 +24,7 @@ pub mod error;
 pub mod state;
 pub mod utils;
 
-declare_id!("pyti8TM4zRVBjmarcgAPmTNNAXYKJv7WVHrkrm6woLN");
+declare_id!("5ukY1VB5gm1mynieWvcy92amcaVPKMSYawN5L96meh7t");
 
 #[program]
 pub mod integrity_pool {
