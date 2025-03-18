@@ -1,4 +1,7 @@
 use {
+    pythnet_sdk::{ messages::{ Message, PublisherStakeCapsMessage, PublisherStakeCap, } },
+    byteorder::BigEndian,
+
     anchor_lang::{
         AccountDeserialize,
         Discriminator,
@@ -221,17 +224,17 @@ pub async fn verify_publisher_caps(
     rpc_client: &RpcClient,
     payer: &dyn Signer,
     publisher_caps: Pubkey,
-    encoded_vaa: Pubkey,
-    merkle_proofs: Vec<MerklePriceUpdate>,
+    _encoded_vaa: Pubkey,
+    _merkle_proofs: Vec<MerklePriceUpdate>,
 ) {
     let accounts = publisher_caps::accounts::VerifyPublisherCaps {
         signer: payer.pubkey(),
         publisher_caps,
-        encoded_vaa,
+        // encoded_vaa,
     };
 
     let instruction_data = publisher_caps::instruction::VerifyPublisherCaps {
-        proof: merkle_proofs[0].proof.to_vec(),
+        // proof: merkle_proofs[0].proof.to_vec(),
     };
 
     let instruction = Instruction {
@@ -1502,4 +1505,192 @@ pub async fn claim_rewards(rpc_client: &RpcClient, signer: &dyn Signer, min_stak
         );
         tokio::time::sleep(tokio::time::Duration::from_secs(10)).await;
     }
+}
+
+// This is called BY the publisher
+pub async fn init_new_stake_account(
+    rpc_client: &RpcClient,
+    signer: &dyn Signer,
+    agreement_hash: [u8; 32],
+) {
+    let pool_config = get_pool_config_address();
+    let PoolConfig {
+        // pool_data,
+        pyth_token_mint,
+        ..
+    } = PoolConfig::try_deserialize(
+        &mut rpc_client
+            .get_account_data(&pool_config)
+            .await
+            .unwrap()
+            .as_slice(),
+    )
+    .unwrap();
+
+    let acc_positions = Keypair::new();
+    let stake_account_positions = acc_positions.pubkey();
+
+    println!("Creating stake account positions {:?}", stake_account_positions);
+
+    let create_stake_account_positions_ix = create_account(
+        &signer.pubkey(),
+        &acc_positions.pubkey(),
+        rpc_client
+            .get_minimum_balance_for_rent_exemption(PositionData::LEN)
+            .await
+            .unwrap(),
+        PositionData::LEN as u64,
+        &staking::ID,
+    );
+
+    // create stake account
+    let stake_account_metadata = get_stake_account_metadata_address(stake_account_positions);
+    let stake_account_custody = get_stake_account_custody_address(stake_account_positions);
+    let custody_authority = get_stake_account_custody_authority_address(stake_account_positions);
+    let config_account = get_config_address();
+
+    println!("Creating stake account metadata {:?}", stake_account_metadata);
+    println!("Creating stake account custody {:?}", stake_account_custody);
+    println!("Creating custody authority {:?}", custody_authority);
+    println!("Creating config account {:?}", config_account);
+
+    // let GlobalConfig {
+    //     agreement_hash,
+    //     ..
+    // } = GlobalConfig::try_deserialize(
+    //     &mut rpc_client
+    //         .get_account_data(&global_config)
+    //         .await
+    //         .unwrap()
+    //         .as_slice(),
+    // )
+    // .unwrap();
+
+    let create_stake_account_data = staking::instruction::CreateStakeAccount {
+        owner: signer.pubkey(),
+        lock:  staking::state::vesting::VestingSchedule::FullyVested,
+    };
+    let create_stake_account_accs = staking::accounts::CreateStakeAccount {
+        payer: signer.pubkey(),
+        stake_account_positions,
+        stake_account_metadata,
+        stake_account_custody,
+        custody_authority,
+        config: config_account,
+        pyth_token_mint,
+        token_program: spl_token::id(),
+        system_program: system_program::ID,
+        rent: solana_sdk::sysvar::rent::ID
+    };
+    let create_stake_account_ix = Instruction::new_with_bytes(
+        staking::ID,
+        &create_stake_account_data.data(),
+        create_stake_account_accs.to_account_metas(None),
+    );
+
+    // Join LLC
+    let join_dao_llc_data = staking::instruction::JoinDaoLlc {
+        _agreement_hash: agreement_hash,
+    };
+    let join_dao_llc_accs = staking::accounts::JoinDaoLlc {
+        owner: signer.pubkey(),
+        stake_account_positions,
+        stake_account_metadata,
+        config: config_account,
+    };
+    let join_dao_llc_ix = Instruction::new_with_bytes(
+        staking::ID,
+        &join_dao_llc_data.data(),
+        join_dao_llc_accs.to_account_metas(None),
+    );
+
+    let tx =process_transaction(
+        rpc_client,
+        &[
+            create_stake_account_positions_ix,
+            create_stake_account_ix,
+            join_dao_llc_ix,
+            ComputeBudgetInstruction::set_compute_unit_limit(1_400_000),
+        ],
+        &[signer, &acc_positions],
+    )
+    .await
+    .unwrap();
+
+    println!("Transaction: {:?}", tx);
+}
+
+pub async fn build_publisher_caps(
+    rpc_client: &RpcClient,
+    signer: &dyn Signer,
+    publishers: Vec<Pubkey>,
+    publisher_caps: Vec<u64>,
+) {
+    // INIT PUBLISHER CAPS Acc
+    let publisher_caps_acc = init_publisher_caps(rpc_client, signer).await;
+
+    // Build message
+    // integration-tests/src/publisher_caps/utils.rs
+    let timestamp = get_current_time(rpc_client).await;
+    let mut caps: Vec<PublisherStakeCap> = vec![];
+
+    for (publisher, cap) in publishers.iter().zip(publisher_caps.iter()) {
+        caps.push(PublisherStakeCap {
+            publisher: publisher.to_bytes(),
+            cap:       *cap,
+        });
+    }
+
+    // publisher caps should always be sorted
+    caps.sort_by_key(|cap| cap.publisher);
+
+    let publisher_caps_message = Message::PublisherStakeCapsMessage(PublisherStakeCapsMessage {
+        publish_time: timestamp,
+        caps:         caps.into(),
+    });
+
+    let publisher_caps_message_bytes =
+        pythnet_sdk::wire::to_vec::<_, BigEndian>(&publisher_caps_message).unwrap();
+
+    // WRITE message to publisher caps account
+    // Check why here is 950 and in integration test are 1k
+    for i in (0..publisher_caps_message_bytes.len()).step_by(950) {
+        let chunk =
+            &publisher_caps_message_bytes[i..min(i + 950, publisher_caps_message_bytes.len())];
+
+        write_publisher_caps(rpc_client, signer, publisher_caps_acc, i, chunk).await;
+    }
+
+    // VERIFY
+    let accounts = publisher_caps::accounts::VerifyPublisherCaps {
+        signer: signer.pubkey(),
+        publisher_caps: publisher_caps_acc
+    };
+
+    let instruction_data = publisher_caps::instruction::VerifyPublisherCaps { };
+
+    let instruction = Instruction {
+        program_id: publisher_caps::ID,
+        accounts:   accounts.to_account_metas(None),
+        data:       instruction_data.data(),
+    };
+
+    process_transaction(
+        rpc_client,
+        &[
+            instruction,
+            ComputeBudgetInstruction::set_compute_unit_limit(1_400_000),
+        ],
+        &[signer],
+    )
+    .await
+    .unwrap();
+
+    println!(
+        "Initialized publisher caps with pubkey : {:?}",
+        publisher_caps
+    );
+
+    advance(rpc_client, signer, publisher_caps_acc).await;
+    close_publisher_caps(rpc_client, signer, publisher_caps_acc).await;
 }

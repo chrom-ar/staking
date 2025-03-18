@@ -62,6 +62,15 @@ export interface AnchorConfig {
     wallet: string;
   };
   programs: {
+    devnet: {
+      staking: string;
+      governance: string;
+      chat: string;
+      wallet_tester: string;
+      profile: string;
+      mint: string;
+      integrity_pool: string;
+    },
     localnet: {
       staking: string;
       governance: string;
@@ -243,7 +252,11 @@ export async function requestPythAirdrop(
   connection: Connection
 ) {
   // Testnet airdrop to ensure that the pyth authority can pay for gas
-  await connection.requestAirdrop(pythMintAuthority.publicKey, 1_000_000_000);
+  try {
+    await connection.requestAirdrop(pythMintAuthority.publicKey, 1_000_000_000);
+  } catch (e) {
+    console.log("Failed to request airdrop");
+  }
 
   const transaction = new Transaction();
 

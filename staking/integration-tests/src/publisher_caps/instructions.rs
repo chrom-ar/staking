@@ -87,17 +87,17 @@ pub fn verify_publisher_caps(
     svm: &mut LiteSVM,
     payer: &Keypair,
     publisher_caps: Pubkey,
-    encoded_vaa: Pubkey,
-    merkle_proofs: Vec<MerklePriceUpdate>,
+    _encoded_vaa: Pubkey,
+    _merkle_proofs: Vec<MerklePriceUpdate>,
 ) -> TransactionResult {
     let accounts = publisher_caps::accounts::VerifyPublisherCaps {
         signer: payer.pubkey(),
         publisher_caps,
-        encoded_vaa,
+        // encoded_vaa,
     };
 
     let instruction_data = publisher_caps::instruction::VerifyPublisherCaps {
-        proof: merkle_proofs[0].proof.to_vec(),
+        // proof: merkle_proofs[0].proof.to_vec(),
     };
 
     let instruction = Instruction {

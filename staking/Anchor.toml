@@ -11,6 +11,7 @@ profile = "bR3uQJLEmg2H46GuozXn8uNQmp2DaZEp6EK1kW56npd"
 publisher_caps = "FaEDHKZKMDemCskgseX4A4r4AxiPCR5cha9vNzd6JUzY"
 staking = "7VgwUAtQbEyd2Ssa9ajMyUJFpbdxNYAKsmkECtZbw3pp"
 wallet_tester = "321KojcMTHwEwzDjt9j71iowtqMPMrfvQ6at1xbJdJWS"
+mint = "FzU14SCpFXTTJq6DuyZrFjE3Pm1SiAZZiivKcJvtQJE4"
 
 [programs.localnet]
 chat = "gCHAtYKrUUktTVzE4hEnZdLV4LXrdBf6Hh9qMaJALET"

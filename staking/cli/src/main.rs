@@ -8,6 +8,7 @@ use {
         Cli,
     },
     instructions::{
+        init_new_stake_account,
         claim_rewards,
         close_all_publisher_caps,
         close_publisher_caps,
@@ -119,6 +120,12 @@ async fn main() {
         }
         Action::ClaimRewards { min_staked } => {
             claim_rewards(&rpc_client, keypair.as_ref(), min_staked).await
+        }
+
+        Action::NewStakeAccount { agreement_hash } => {
+            init_new_stake_account(
+                &rpc_client, keypair.as_ref(), agreement_hash
+            ).await
         }
     }
 }

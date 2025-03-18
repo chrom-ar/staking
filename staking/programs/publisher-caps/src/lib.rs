@@ -8,22 +8,10 @@ use {
         Pod,
         Zeroable,
     },
-    pythnet_sdk::{
-        accumulators::merkle::{
-            MerklePath,
-            MerkleRoot,
-        },
-        hashers::keccak256_160::Keccak160,
-        wire::v1::{
-            WormholeMessage,
-            WormholePayload,
-        },
-    },
     std::convert::{
         TryFrom,
         TryInto,
     },
-    wormhole_solana_vaas::zero_copy::VaaAccount,
 };
 
 declare_id!("FaEDHKZKMDemCskgseX4A4r4AxiPCR5cha9vNzd6JUzY");
@@ -34,6 +22,11 @@ pub const PRICE_FEEDS_EMITTER_ADDRESS: Pubkey =
 pub const PRICE_FEEDS_EMITTER_CHAIN: u16 = 26; //pythnet
 pub const PUBLISHER_STAKE_CAPS_MESSAGE_DISCRIMINATOR: u8 = 2;
 pub const MAX_CAPS: usize = 1024;
+
+// Add more adminst if needed
+pub const ADMINS: [Pubkey; 1] = [
+    pubkey!("1pDMJMkbH5HexixGiwJ1yMuH9EMz28DGyWebuRZy6qA"),
+];
 
 #[program]
 pub mod publisher_caps {
@@ -80,44 +73,44 @@ pub mod publisher_caps {
         Ok(())
     }
 
+    // TODO: Back to 0 when we can verify in some other way
     pub fn verify_publisher_caps(
-        ctx: Context<VerifyPublisherCaps>,
-        proof: Vec<[u8; 20]>,
+        ctx: Context<VerifyPublisherCaps>
+        // proof: Vec<[u8; 20]>,
     ) -> Result<()> {
-        let vaa = VaaAccount::load_unchecked(&ctx.accounts.encoded_vaa);
+        // let vaa = VaaAccount::load_unchecked(&ctx.accounts.encoded_vaa);
         let publisher_caps = &mut ctx.accounts.publisher_caps.load_mut()?;
 
+        // require_eq!(
+        //     Pubkey::from(vaa.emitter_address()),
+        //     PRICE_FEEDS_EMITTER_ADDRESS,
+        //     PublisherCapsError::WrongEmitterAddress
+        // );
+        // require_eq!(
+        //     vaa.emitter_chain(),
+        //     PRICE_FEEDS_EMITTER_CHAIN,
+        //     PublisherCapsError::WrongEmitterChain
+        // );
 
-        require_eq!(
-            Pubkey::from(vaa.emitter_address()),
-            PRICE_FEEDS_EMITTER_ADDRESS,
-            PublisherCapsError::WrongEmitterAddress
-        );
-        require_eq!(
-            vaa.emitter_chain(),
-            PRICE_FEEDS_EMITTER_CHAIN,
-            PublisherCapsError::WrongEmitterChain
-        );
+        // require_eq!(
+        //     publisher_caps.discriminator(),
+        //     PUBLISHER_STAKE_CAPS_MESSAGE_DISCRIMINATOR,
+        //     PublisherCapsError::WrongDiscriminator // This is not a PublisherStakeCaps message
+        // );
 
-        require_eq!(
-            publisher_caps.discriminator(),
-            PUBLISHER_STAKE_CAPS_MESSAGE_DISCRIMINATOR,
-            PublisherCapsError::WrongDiscriminator // This is not a PublisherStakeCaps message
-        );
+        // let wormhole_message = WormholeMessage::try_from_bytes(vaa.payload())
+        //     .map_err(|_| PublisherCapsError::InvalidWormholeMessage)?;
+        // let root: MerkleRoot<Keccak160> = MerkleRoot::new(match wormhole_message.payload {
+        //     WormholePayload::Merkle(merkle_root) => merkle_root.root,
+        // });
 
-        let wormhole_message = WormholeMessage::try_from_bytes(vaa.payload())
-            .map_err(|_| PublisherCapsError::InvalidWormholeMessage)?;
-        let root: MerkleRoot<Keccak160> = MerkleRoot::new(match wormhole_message.payload {
-            WormholePayload::Merkle(merkle_root) => merkle_root.root,
-        });
-
-        if !root.check(
-            MerklePath::<Keccak160>::new(proof),
-            &publisher_caps.publisher_caps_message_buffer
-                [..1 + 8 + 2 + publisher_caps.num_publishers() as usize * PublisherCap::LEN],
-        ) {
-            return err!(PublisherCapsError::InvalidMerkleProof);
-        }
+        // if !root.check(
+        //     MerklePath::<Keccak160>::new(proof),
+        //     &publisher_caps.publisher_caps_message_buffer
+        //         [..1 + 8 + 2 + publisher_caps.num_publishers() as usize * PublisherCap::LEN],
+        // ) {
+        //     return err!(PublisherCapsError::InvalidMerkleProof);
+        // }
 
         publisher_caps.is_verified = 1;
 
@@ -203,6 +196,7 @@ impl PublisherCaps {
 
 #[derive(Accounts)]
 pub struct InitPublisherCaps<'info> {
+    // #[account(signer, constraint = ADMINS.contains(&signer.key))]
     pub signer:         Signer<'info>,
     #[account(zero)]
     pub publisher_caps: AccountLoader<'info, PublisherCaps>,
@@ -210,6 +204,7 @@ pub struct InitPublisherCaps<'info> {
 
 #[derive(Accounts)]
 pub struct WritePublisherCaps<'info> {
+    // #[account(signer, constraint = ADMINS.contains(&write_authority.key))]
     pub write_authority: Signer<'info>,
     #[account(mut, has_one = write_authority @ PublisherCapsError::WrongWriteAuthority)]
     pub publisher_caps:  AccountLoader<'info, PublisherCaps>,
@@ -217,13 +212,14 @@ pub struct WritePublisherCaps<'info> {
 
 #[derive(Accounts)]
 pub struct VerifyPublisherCaps<'info> {
+    // #[account(signer, constraint = ADMINS.contains(&signer.key))]
     pub signer:         Signer<'info>,
     #[account(mut)]
     pub publisher_caps: AccountLoader<'info, PublisherCaps>,
-    /// CHECK: We aren't deserializing the VAA here but later with VaaAccount::load_unchecked,
-    /// which is the recommended way
-    #[account(owner = WORMHOLE_RECEIVER @ PublisherCapsError::WrongVaaOwner)]
-    pub encoded_vaa:    AccountInfo<'info>,
+    // /// CHECK: We aren't deserializing the VAA here but later with VaaAccount::load_unchecked,
+    // /// which is the recommended way
+    // #[account(owner = WORMHOLE_RECEIVER @ PublisherCapsError::WrongVaaOwner)]
+    // pub encoded_vaa:    AccountInfo<'info>,
 }
 
 #[derive(Accounts)]
@@ -236,15 +232,15 @@ pub struct ClosePublisherCaps<'info> {
 
 #[error_code]
 pub enum PublisherCapsError {
-    InvalidWormholeMessage,
-    InvalidMerkleProof,
+    // InvalidWormholeMessage,
+    // InvalidMerkleProof,
     CantMutateVerifiedPublisherCaps,
     DataOverflow,
-    WrongVaaOwner,
+    // WrongVaaOwner,
     WrongWriteAuthority,
-    WrongEmitterAddress,
-    WrongEmitterChain,
-    WrongDiscriminator,
+    // WrongEmitterAddress,
+    // WrongEmitterChain,
+    // WrongDiscriminator,
 }
 
 #[cfg(test)]
