@@ -451,6 +451,7 @@ pub async fn close_encoded_vaa(
         .unwrap();
 }
 
+
 pub async fn initialize_reward_custody(rpc_client: &RpcClient, payer: &dyn Signer) {
     let pool_config = get_pool_config_address();
 
@@ -1530,11 +1531,10 @@ pub async fn init_new_stake_account(
     let acc_positions = Keypair::new();
     let stake_account_positions = acc_positions.pubkey();
 
-    println!("Creating stake account positions {:?}", stake_account_positions);
 
     let create_stake_account_positions_ix = create_account(
         &signer.pubkey(),
-        &acc_positions.pubkey(),
+        &stake_account_positions,
         rpc_client
             .get_minimum_balance_for_rent_exemption(PositionData::LEN)
             .await
@@ -1549,10 +1549,27 @@ pub async fn init_new_stake_account(
     let custody_authority = get_stake_account_custody_authority_address(stake_account_positions);
     let config_account = get_config_address();
 
-    println!("Creating stake account metadata {:?}", stake_account_metadata);
-    println!("Creating stake account custody {:?}", stake_account_custody);
-    println!("Creating custody authority {:?}", custody_authority);
-    println!("Creating config account {:?}", config_account);
+    let mut file = File::create("./publisher-data.json").unwrap();
+    file.write_all(
+        format!(
+            "{{\"stakeAccountPositions\": \"{:?}\",
+               \"stakeAccountMetadata\": \"{:?}\",
+               \"stakeAccountCustody\": \"{:?}\",
+               \"custodyAuthority\": \"{:?}\",
+               \"configAccount\": \"{:?}\"}}",
+            stake_account_positions,
+            stake_account_metadata,
+            stake_account_custody,
+            custody_authority,
+            config_account
+        ).as_bytes()
+    ).unwrap();
+
+    // println!("{{ \"stakeAccountPositions\": \"{:?}\",", stake_account_positions);
+    // println!("\"stakeAccountMetadata\": \"{:?}\",", stake_account_metadata);
+    // println!("\"stakeAccountCustody\": \"{:?}\",", stake_account_custody);
+    // println!("\"custodyAuthority\": \"{:?}\",", custody_authority);
+    // println!("\"configAccount\": \"{:?}\" }}", config_account);
 
     // let GlobalConfig {
     //     agreement_hash,
@@ -1617,7 +1634,7 @@ pub async fn init_new_stake_account(
     .await
     .unwrap();
 
-    println!("Transaction: {:?}", tx);
+    // println!("Transaction: {:?}", tx);
 }
 
 pub async fn build_publisher_caps(

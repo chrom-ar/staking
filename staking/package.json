@@ -1,7 +1,7 @@
 {
-  "name": "@pythnetwork/staking",
-  "version": "2.3.0",
-  "description": "Pyth Network Staking SDK",
+  "name": "staking-tmp",
+  "version": "1.0.0",
+  "description": "Chroma Staking SDK",
   "main": "lib/app/index.js",
   "types": "lib/app/index.d.ts",
   "license": "MIT",
@@ -10,7 +10,7 @@
     "target/idl",
     "target/types"
   ],
-  "repository": "https://github.com/pyth-network/governance/tree/main/staking",
+  "repository": "https://github.com/chrom-ar/staking",
   "dependencies": {
     "@coral-xyz/anchor": "^0.30.1",
     "@pythnetwork/solana-utils": "^0.4.1",

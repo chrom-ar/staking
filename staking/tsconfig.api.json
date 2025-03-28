@@ -10,6 +10,6 @@
     "declaration": true,
     "resolveJsonModule": true
   },
-  "include": ["./app/*.ts"],
+  "include": ["./app/*.ts", "./app/*.js"],
   "exclude": ["./tests", "./docker", "./migrations"]
 }

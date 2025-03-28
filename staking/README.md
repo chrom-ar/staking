@@ -36,30 +36,10 @@ If you want to create a verifiable build for testing, use the -t option:
 
 The result of the build will be `target` folder.
 
-## Clone the required programs
-
-To clone the governance and chat programs from the Devnet environment, execute the following command:
+## Compile needed programs
 
 ```bash
-npm run dump_governance
-```
-
-## Run tests
-
-To run the tests locally use the following command:
-
-```bash
-npm run test -- tests/*.ts
-```
-
-It's useful sometimes to keep the validator running after the tests are done. To do that, you can use the `DETACH` environment variable:
-
-```bash
-DETACH=1 npm run test -- tests/staking.ts
-```
-
-To run the tests with verifiable builds:
-
-```bash
-npm run test:ci
+yarn run build_wasm
+anchor build
+cargo build --package=staking-cli --release
 ```

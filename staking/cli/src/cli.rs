@@ -126,6 +126,12 @@ pub enum Action {
         #[clap(long, help = "Agreement hash", parse(try_from_str = get_agreement_hash_from_string))]
         agreement_hash: [u8; 32],
     },
+    BuildPublisherCaps {
+        #[clap(long, help = "Publishers")]
+        publishers: Vec<Pubkey>,
+        #[clap(long, help = "Publisher caps")]
+        publisher_caps: Vec<u64>,
+    },
 }
 
 pub enum SignerSource {

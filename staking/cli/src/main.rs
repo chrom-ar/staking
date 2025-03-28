@@ -9,6 +9,7 @@ use {
     },
     instructions::{
         init_new_stake_account,
+        build_publisher_caps,
         claim_rewards,
         close_all_publisher_caps,
         close_publisher_caps,
@@ -127,5 +128,11 @@ async fn main() {
                 &rpc_client, keypair.as_ref(), agreement_hash
             ).await
         }
+        Action::BuildPublisherCaps { publishers, publisher_caps } => {
+            build_publisher_caps(
+                &rpc_client, keypair.as_ref(), publishers, publisher_caps
+            ).await
+        }
+
     }
 }
