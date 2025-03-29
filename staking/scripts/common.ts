@@ -31,7 +31,7 @@ export const full = () => {
   const pythMintAccount = new PublicKey(deployData.mintToken);
   const authority = Keypair.fromSecretKey(new Uint8Array(
     JSON.parse(
-      fs.readFileSync(`/home/rotsen/.config/solana/id.json`).toString()
+      fs.readFileSync(`${process.env.HOME}/.config/solana/id.json`).toString()
     ) // ['_keypair']['secretKey'])
   ))
   const publisher = Keypair.fromSecretKey(new Uint8Array(
