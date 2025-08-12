@@ -1,0 +1,55 @@
+Global Config Acc:  PublicKey [PublicKey(C4FHCTRTux6rqaV3rk79VGD4xtTk3zGhVNRwXh5ZmQMX)] {
+  _bn: <BN: a44571b97728b6d7f2acf54f28f40185722cb4f6dd2d88f6582399f22ce5f942>
+}
+(node:899399) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+{
+  bump: 254,
+  governanceAuthority: PublicKey [PublicKey(1pDMJMkbH5HexixGiwJ1yMuH9EMz28DGyWebuRZy6qA)] {
+    _bn: <BN: 356242c0b5c42be81dc2e75be00759aac7b1408ff9662e51adb59b3991475d>
+  },
+  pythTokenMint: PublicKey [PublicKey(FzU14SCpFXTTJq6DuyZrFjE3Pm1SiAZZiivKcJvtQJE4)] {
+    _bn: <BN: debc40d433dbaea8644cfe64323438e244dff0349edb8274b96c5738d2aeca01>
+  },
+  pythGovernanceRealm: PublicKey [PublicKey(11111111111111111111111111111111)] {
+    _bn: <BN: 0>
+  },
+  removedUnlockingDuration: 0,
+  epochDuration: <BN: 2a300>,
+  freeze: false,
+  pdaAuthority: PublicKey [PublicKey(1pDMJMkbH5HexixGiwJ1yMuH9EMz28DGyWebuRZy6qA)] {
+    _bn: <BN: 356242c0b5c42be81dc2e75be00759aac7b1408ff9662e51adb59b3991475d>
+  },
+  governanceProgram: PublicKey [PublicKey(pytGY6tWRgGinSCvRLnSv4fHfBTMoiDGiCsesmHWM6U)] {
+    _bn: <BN: c4a9dec7d3c9569f17a9fe640811b203da0456ca39666c1dbc3454dffe3b015>
+  },
+  pythTokenListTime: null,
+  agreementHash: [
+     0,  1,  2,  3,  4,  5,  6,  7,  8,
+     9, 10, 11, 12, 13, 14, 15, 16, 17,
+    18, 19, 20, 21, 22, 23, 24, 25, 26,
+    27, 28, 29, 30, 31
+  ],
+  mockClockTime: <BN: 0>,
+  poolAuthority: PublicKey [PublicKey(1pDMJMkbH5HexixGiwJ1yMuH9EMz28DGyWebuRZy6qA)] {
+    _bn: <BN: 356242c0b5c42be81dc2e75be00759aac7b1408ff9662e51adb59b3991475d>
+  }
+}
+
+poolData: PublicKey [PublicKey(8bGWCWfSaXez32mio4zjsSjHRbU6KJuexmhhHnZqjM5s)] {
+_bn: <BN: 70c915f4e5ea0511ba5efc23c673fbded43fc57a870a6472f8f8d3ef23aeaaba>
+          },
+poolConfig: PublicKey [PublicKey(EWEzUYAyGwiZbdsymSLpjEtRAVr1xPehRkqAvHpJwiNS)] {
+_bn: <BN: c8a597d687287772bf6568933d2a63533ffa5d71ecbc65a308ef77def38d5fff>
+            },
+slashCustody: PublicKey [PublicKey(B7Ax8c2oLyxHuKkUHWcJ8T2kyHSqXonB5xkY1a95wdgm)] {
+_bn: <BN: 96299af009ce0dec080f1b9e7fd947cbd9107fbf924216fc49cce4b9d1590f02>
+              }
+
+Publisher DATA:
+stake account positions 4WjhLLGv79gRD9mKqPwDbZJGAiRX4jqtvX8tTpGMdF19
+stake account metadata 4HhZLFXdr4yn7c45DnUYhWGfjnYLcZui6GqsRzLKxDQF
+stake account custody 6j2TdUN9UEvZrMnDE87eE1CDJkM2ehA9fPyv5vcKdECo
+custody authority 6WBnByt7XSdNF5kfbhxbsVnxoT1DLreuJ6ApvqQZegq8
+config account C4FHCTRTux6rqaV3rk79VGD4xtTk3zGhVNRwXh5ZmQMX
+Publisher: 5316ZeWzMAspZByCAVTiNqgwm9By8GooPdrmEbFttCiU

@@ -1,0 +1,10 @@
+{
+  "commandName": "CreateToken",
+  "commandOutput": {
+      "address": "FysSBjLdYiDNUTiKtCBZY29uWL3zJnCayYLKA9nuzPAY",
+      "decimals": 9,
+      "transactionData": {
+            "signature": "3ofXBo6q6BKcJzH16iRb6BNcxyXEJpsWSDss4VnwHzQ2XuSfnQiUDWvsMzgsUMoFtsEs8s4G29Lzkus7hscvB7JF"
+          }
+    }
+}

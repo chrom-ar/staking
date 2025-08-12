@@ -1,0 +1,5 @@
+Creating stake account positions J7LW5N1ar9c1HGvjBdx9rWzgyA5Dqj3hYXyzecxHTuwY
+Creating stake account metadata 2FU6U9P22trqUsAiaeJAF2uAHcLzNbfaHcs7QfMqugcz
+Creating stake account custody 9XN4tKp76WRFrQyDc28n9RBw6xzv4zbUw7wmX29nG5mq
+Creating custody authority 7vzwZAZFPQ2ySXbjRLdy7Z76qSYysjtVr5W3YPUJFCPY
+Creating config account C4FHCTRTux6rqaV3rk79VGD4xtTk3zGhVNRwXh5ZmQMX
